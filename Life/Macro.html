@@ -78,10 +78,31 @@ canvas{max-width:100%;margin-top:20px}
 
 .note{
   background:#f1f5f9;
-  padding:14px;
+  padding:16px;
   border-radius:12px;
   font-size:14px;
   line-height:1.6;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+  font-size:14px;
+}
+th,td{
+  padding:10px;
+  border-bottom:1px solid #e5e7eb;
+  vertical-align:top;
+}
+th{
+  background:#f8fafc;
+  text-align:left;
+}
+
+@media(max-width:768px){
+  table{font-size:13px}
+  td{white-space:normal}
 }
 </style>
 </head>
@@ -100,7 +121,7 @@ canvas{max-width:100%;margin-top:20px}
     <label>Units</label>
     <select id="unit">
       <option value="metric">Metric (kg / cm)</option>
-      <option value="us">US (lb / ft)</option>
+      <option value="us">US (lb / in)</option>
     </select>
   </div>
 
@@ -178,7 +199,41 @@ canvas{max-width:100%;margin-top:20px}
 </div>
 
 <canvas id="macroChart" height="240"></canvas>
+
 <div class="note" id="insight"></div>
+</div>
+
+<!-- WEEKLY MEAL PLANNER -->
+<div class="card">
+<h2>Weekly Meal Planner (Sample)</h2>
+<table>
+<thead>
+<tr>
+<th>Day</th>
+<th>Breakfast</th>
+<th>Lunch</th>
+<th>Dinner</th>
+<th>Snacks</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Monday</td><td>Eggs & oats</td><td>Chicken + rice</td><td>Fish & vegetables</td><td>Fruit, nuts</td></tr>
+<tr><td>Tuesday</td><td>Greek yogurt</td><td>Paneer & roti</td><td>Lean beef & salad</td><td>Seeds</td></tr>
+<tr><td>Wednesday</td><td>Smoothie</td><td>Dal & rice</td><td>Chicken stir-fry</td><td>Yogurt</td></tr>
+<tr><td>Thursday</td><td>Egg omelette</td><td>Quinoa bowl</td><td>Fish curry</td><td>Fruit</td></tr>
+<tr><td>Friday</td><td>Oats</td><td>Chicken wrap</td><td>Vegetable curry</td><td>Nuts</td></tr>
+<tr><td>Saturday</td><td>Protein shake</td><td>Rice & lentils</td><td>Grilled chicken</td><td>Fruit</td></tr>
+<tr><td>Sunday</td><td>Light breakfast</td><td>Home meal</td><td>Balanced dinner</td><td>Optional</td></tr>
+</tbody>
+</table>
+
+<div class="note">
+<b>Medical disclaimer:</b><br>
+This meal planner is a **general example only** and not a prescription.
+Actual food choices should be individualized based on medical conditions,
+allergies, pregnancy, diabetes, kidney disease, eating disorders,
+or advice from a registered dietitian or healthcare professional.
+</div>
 </div>
 
 </div>
@@ -188,10 +243,7 @@ let chart;
 
 function calculate(){
   let h=+height.value, w=+weight.value;
-  if(unit.value==="us"){
-    h*=2.54;       // inches to cm
-    w*=0.453592;   // lb to kg
-  }
+  if(unit.value==="us"){ h*=2.54; w*=0.453592; }
 
   const a=+age.value, g=gender.value;
   if(!a||!h||!w){alert("Fill all fields");return;}
@@ -203,22 +255,14 @@ function calculate(){
   let calories=bmr*+activity.value;
   if(goal.value==="lose") calories-=400;
   if(goal.value==="gain") calories+=300;
-
-  calories += +workout.value||0;
+  calories+=+workout.value||0;
 
   let protein=w*(goal.value==="gain"?2.2:goal.value==="recomp"?2.0:1.8);
-
   let fat, carbs;
-  if(diet.value==="keto"){
-    carbs=30;
-    fat=(calories-(protein*4+carbs*4))/9;
-  }else if(diet.value==="lowcarb"){
-    carbs=100;
-    fat=(calories-(protein*4+carbs*4))/9;
-  }else{
-    fat=(calories*0.25)/9;
-    carbs=(calories-(protein*4+fat*9))/4;
-  }
+
+  if(diet.value==="keto"){ carbs=30; fat=(calories-(protein*4+carbs*4))/9; }
+  else if(diet.value==="lowcarb"){ carbs=100; fat=(calories-(protein*4+carbs*4))/9; }
+  else{ fat=(calories*0.25)/9; carbs=(calories-(protein*4+fat*9))/4; }
 
   caloriesEl.textContent=Math.round(calories);
   proteinEl.textContent=Math.round(protein);
@@ -226,22 +270,18 @@ function calculate(){
   fatEl.textContent=Math.round(fat);
 
   insight.innerHTML=`
-  <b>Mode:</b> ${diet.value.toUpperCase()}<br>
+  <b>Diet mode:</b> ${diet.value.toUpperCase()}<br>
   <b>Workout calories added:</b> ${workout.value||0} kcal<br><br>
-  <b>Medical note:</b> Values are estimates for healthy adults.
-  Keto & low-carb modes adjust macro ratios only, not calorie needs.
+  <b>Medical disclaimer:</b> Results are estimates only.
+  Not intended for pregnancy, eating disorders, or medical conditions.
   `;
 
-  drawChart(protein,carbs,fat);
-}
-
-function drawChart(p,c,f){
   if(chart) chart.destroy();
   chart=new Chart(macroChart,{
     type:"pie",
     data:{
       labels:["Protein","Carbs","Fat"],
-      datasets:[{data:[p*4,c*4,f*9],
+      datasets:[{data:[protein*4,carbs*4,fat*9],
       backgroundColor:["#60a5fa","#34d399","#fbbf24"]}]
     },
     options:{plugins:{legend:{position:"bottom"}}}
