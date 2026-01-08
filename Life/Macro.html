@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced Macro Calculator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root{
+  --primary:#2563eb;
+  --bg:#f4f7fb;
+  --card:#ffffff;
+  --radius:16px;
+  --text:#1f2937;
+  --muted:#6b7280;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,Arial;
+  background:var(--bg);
+  color:var(--text);
+}
+.container{max-width:1100px;margin:auto;padding:20px}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:28px;
+  box-shadow:0 14px 36px rgba(0,0,0,.08);
+  margin-bottom:20px;
+}
+h1,h2{margin:0 0 10px;color:var(--primary)}
+small{color:var(--muted)}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:16px;
+}
+
+.field{display:flex;flex-direction:column}
+.field label{font-size:14px;margin-bottom:6px}
+.field input,.field select{
+  height:52px;
+  padding:12px 14px;
+  font-size:16px;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+
+button{
+  width:100%;
+  padding:18px;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  font-size:18px;
+  cursor:pointer;
+}
+
+.results{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;
+}
+.box{
+  background:#f8fafc;
+  padding:18px;
+  border-radius:12px;
+  text-align:center;
+}
+.box b{font-size:22px}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+  font-size:14px;
+}
+th,td{
+  padding:10px;
+  border-bottom:1px solid #e5e7eb;
+  text-align:left;
+}
+th{background:#f1f5f9}
+
+canvas{max-width:100%;margin-top:20px}
+
+.note{
+  background:#f1f5f9;
+  padding:14px;
+  border-radius:12px;
+  font-size:14px;
+  line-height:1.6;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<!-- INPUT -->
+<div class="card">
+<h1>Macro Calculator</h1>
+<small>Calories · Protein · Carbs · Fat · Advanced tools</small>
+
+<div class="grid">
+  <div class="field">
+    <label>Gender</label>
+    <select id="gender"><option value="male">Male</option><option value="female">Female</option></select>
+  </div>
+  <div class="field">
+    <label>Age</label>
+    <input id="age" type="number" min="10" max="100">
+  </div>
+  <div class="field">
+    <label>Height (cm)</label>
+    <input id="height" type="number">
+  </div>
+  <div class="field">
+    <label>Weight (kg)</label>
+    <input id="weight" type="number">
+  </div>
+  <div class="field">
+    <label>Activity</label>
+    <select id="activity">
+      <option value="1.2">Sedentary</option>
+      <option value="1.375">Light</option>
+      <option value="1.55">Moderate</option>
+      <option value="1.725">Very active</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Goal</label>
+    <select id="goal">
+      <option value="maintain">Maintain</option>
+      <option value="lose">Fat Loss</option>
+      <option value="gain">Muscle Gain</option>
+      <option value="recomp">Body Recomposition</option>
+    </select>
+  </div>
+</div>
+
+<br>
+<button onclick="calculate()">Calculate</button>
+</div>
+
+<!-- RESULTS -->
+<div class="card">
+<div class="results">
+  <div class="box">Calories<br><b id="cal">—</b></div>
+  <div class="box">Protein<br><b id="pro">—</b> g</div>
+  <div class="box">Carbs<br><b id="carb">—</b> g</div>
+  <div class="box">Fat<br><b id="fat">—</b> g</div>
+</div>
+
+<canvas id="chart" height="220"></canvas>
+</div>
+
+<!-- BODY RECOMPOSITION -->
+<div class="card">
+<h2>Body Recomposition Insight</h2>
+<div id="recomp" class="note">—</div>
+</div>
+
+<!-- MEAL PLAN -->
+<div class="card">
+<h2>Sample Daily Meal Plan</h2>
+<table>
+<tr><th>Meal</th><th>Food Example</th><th>Macro Focus</th></tr>
+<tr><td>Breakfast</td><td>Eggs + Oats</td><td>Protein + Carbs</td></tr>
+<tr><td>Lunch</td><td>Chicken, Rice, Veggies</td><td>Balanced</td></tr>
+<tr><td>Snack</td><td>Greek Yogurt + Nuts</td><td>Protein + Fat</td></tr>
+<tr><td>Dinner</td><td>Fish / Paneer + Salad</td><td>Protein</td></tr>
+</table>
+</div>
+
+<!-- FOOD LIST -->
+<div class="card">
+<h2>Macro Food List</h2>
+<table>
+<tr><th>Protein</th><th>Carbs</th><th>Fats</th></tr>
+<tr><td>Chicken breast</td><td>Rice</td><td>Olive oil</td></tr>
+<tr><td>Eggs</td><td>Oats</td><td>Avocado</td></tr>
+<tr><td>Fish</td><td>Potatoes</td><td>Nuts</td></tr>
+<tr><td>Paneer</td><td>Fruits</td><td>Seeds</td></tr>
+</table>
+</div>
+
+</div>
+
+<script>
+let pie;
+
+function calculate(){
+  const g=gender.value,a=+age.value,h=+height.value,w=+weight.value;
+  if(!a||!h||!w){alert("Fill all fields");return;}
+  let bmr=g==="male"?(10*w+6.25*h-5*a+5):(10*w+6.25*h-5*a-161);
+  let cal=bmr*+activity.value;
+  if(goal.value==="lose") cal-=400;
+  if(goal.value==="gain") cal+=300;
+
+  let protein=w*(goal.value==="gain"?2.2:goal.value==="recomp"?2.0:1.8);
+  let fat=(cal*0.25)/9;
+  let carbs=(cal-(protein*4+fat*9))/4;
+  if(carbs<0) carbs=0;
+
+  cal=Math.round(cal); protein=Math.round(protein);
+  carbs=Math.round(carbs); fat=Math.round(fat);
+
+  calEl.textContent=cal;
+  proEl.textContent=protein;
+  carbEl.textContent=carbs;
+  fatEl.textContent=fat;
+
+  recomp.innerHTML = goal.value==="recomp"
+  ? "You are in body recomposition mode: slight calorie balance with high protein to lose fat while preserving muscle."
+  : "Standard macro distribution based on your selected goal.";
+
+  drawChart(protein,carbs,fat);
+}
+
+function drawChart(p,c,f){
+  const ctx=document.getElementById("chart");
+  if(pie) pie.destroy();
+  pie=new Chart(ctx,{
+    type:"pie",
+    data:{
+      labels:["Protein","Carbs","Fat"],
+      datasets:[{data:[p*4,c*4,f*9],backgroundColor:["#60a5fa","#34d399","#fbbf24"]}]
+    },
+    options:{plugins:{legend:{position:"bottom"}}}
+  });
+}
+
+const gender=document.getElementById("gender");
+const age=document.getElementById("age");
+const height=document.getElementById("height");
+const weight=document.getElementById("weight");
+const activity=document.getElementById("activity");
+const goal=document.getElementById("goal");
+
+const calEl=document.getElementById("cal");
+const proEl=document.getElementById("pro");
+const carbEl=document.getElementById("carb");
+const fatEl=document.getElementById("fat");
+const recomp=document.getElementById("recomp");
+</script>
+
+</body>
+</html>
