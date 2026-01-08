@@ -84,6 +84,7 @@ canvas{max-width:100%;margin-top:20px}
   line-height:1.6;
 }
 
+/* TABLE */
 table{
   width:100%;
   border-collapse:collapse;
@@ -100,9 +101,27 @@ th{
   text-align:left;
 }
 
-@media(max-width:768px){
-  table{font-size:13px}
-  td{white-space:normal}
+/* ✅ MOBILE MEAL PLANNER FIX */
+@media (max-width:768px){
+  table thead{display:none}
+  table,tbody,tr,td{display:block;width:100%}
+  tr{
+    margin-bottom:16px;
+    background:#f8fafc;
+    border-radius:12px;
+    padding:12px;
+  }
+  td{
+    border:none;
+    padding:6px 0;
+  }
+  td::before{
+    content:attr(data-label);
+    font-weight:600;
+    display:block;
+    color:#374151;
+    margin-bottom:2px;
+  }
 }
 </style>
 </head>
@@ -199,7 +218,6 @@ th{
 </div>
 
 <canvas id="macroChart" height="240"></canvas>
-
 <div class="note" id="insight"></div>
 </div>
 
@@ -207,29 +225,62 @@ th{
 <div class="card">
 <h2>Weekly Meal Planner (Sample)</h2>
 <table>
-<thead>
-<tr>
-<th>Day</th>
-<th>Breakfast</th>
-<th>Lunch</th>
-<th>Dinner</th>
-<th>Snacks</th>
-</tr>
-</thead>
 <tbody>
-<tr><td>Monday</td><td>Eggs & oats</td><td>Chicken + rice</td><td>Fish & vegetables</td><td>Fruit, nuts</td></tr>
-<tr><td>Tuesday</td><td>Greek yogurt</td><td>Paneer & roti</td><td>Lean beef & salad</td><td>Seeds</td></tr>
-<tr><td>Wednesday</td><td>Smoothie</td><td>Dal & rice</td><td>Chicken stir-fry</td><td>Yogurt</td></tr>
-<tr><td>Thursday</td><td>Egg omelette</td><td>Quinoa bowl</td><td>Fish curry</td><td>Fruit</td></tr>
-<tr><td>Friday</td><td>Oats</td><td>Chicken wrap</td><td>Vegetable curry</td><td>Nuts</td></tr>
-<tr><td>Saturday</td><td>Protein shake</td><td>Rice & lentils</td><td>Grilled chicken</td><td>Fruit</td></tr>
-<tr><td>Sunday</td><td>Light breakfast</td><td>Home meal</td><td>Balanced dinner</td><td>Optional</td></tr>
+<tr>
+<td data-label="Day">Monday</td>
+<td data-label="Breakfast">Eggs & oats</td>
+<td data-label="Lunch">Chicken + rice</td>
+<td data-label="Dinner">Fish & vegetables</td>
+<td data-label="Snacks">Fruit, nuts</td>
+</tr>
+<tr>
+<td data-label="Day">Tuesday</td>
+<td data-label="Breakfast">Greek yogurt</td>
+<td data-label="Lunch">Paneer & roti</td>
+<td data-label="Dinner">Lean beef & salad</td>
+<td data-label="Snacks">Seeds</td>
+</tr>
+<tr>
+<td data-label="Day">Wednesday</td>
+<td data-label="Breakfast">Smoothie</td>
+<td data-label="Lunch">Dal & rice</td>
+<td data-label="Dinner">Chicken stir-fry</td>
+<td data-label="Snacks">Yogurt</td>
+</tr>
+<tr>
+<td data-label="Day">Thursday</td>
+<td data-label="Breakfast">Egg omelette</td>
+<td data-label="Lunch">Quinoa bowl</td>
+<td data-label="Dinner">Fish curry</td>
+<td data-label="Snacks">Fruit</td>
+</tr>
+<tr>
+<td data-label="Day">Friday</td>
+<td data-label="Breakfast">Oats</td>
+<td data-label="Lunch">Chicken wrap</td>
+<td data-label="Dinner">Vegetable curry</td>
+<td data-label="Snacks">Nuts</td>
+</tr>
+<tr>
+<td data-label="Day">Saturday</td>
+<td data-label="Breakfast">Protein shake</td>
+<td data-label="Lunch">Rice & lentils</td>
+<td data-label="Dinner">Grilled chicken</td>
+<td data-label="Snacks">Fruit</td>
+</tr>
+<tr>
+<td data-label="Day">Sunday</td>
+<td data-label="Breakfast">Light breakfast</td>
+<td data-label="Lunch">Home meal</td>
+<td data-label="Dinner">Balanced dinner</td>
+<td data-label="Snacks">Optional</td>
+</tr>
 </tbody>
 </table>
 
 <div class="note">
 <b>Medical disclaimer:</b><br>
-This meal planner is a **general example only** and not a prescription.
+This meal planner is a <b>general example only</b> and not a prescription.
 Actual food choices should be individualized based on medical conditions,
 allergies, pregnancy, diabetes, kidney disease, eating disorders,
 or advice from a registered dietitian or healthcare professional.
