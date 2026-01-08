@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Advanced Macro Calculator</title>
+<title>Macro Calculator – Medical Standard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -74,19 +74,6 @@ button{
 }
 .box b{font-size:22px}
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:10px;
-  font-size:14px;
-}
-th,td{
-  padding:10px;
-  border-bottom:1px solid #e5e7eb;
-  text-align:left;
-}
-th{background:#f1f5f9}
-
 canvas{max-width:100%;margin-top:20px}
 
 .note{
@@ -105,25 +92,50 @@ canvas{max-width:100%;margin-top:20px}
 <!-- INPUT -->
 <div class="card">
 <h1>Macro Calculator</h1>
-<small>Calories · Protein · Carbs · Fat · Advanced tools</small>
+<small>Calories · Protein · Carbs · Fat · Medical standard</small>
 
 <div class="grid">
+
+  <div class="field">
+    <label>Units</label>
+    <select id="unit">
+      <option value="metric">Metric (kg / cm)</option>
+      <option value="us">US (lb / ft)</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Diet Mode</label>
+    <select id="diet">
+      <option value="balanced">Balanced</option>
+      <option value="lowcarb">Low-carb</option>
+      <option value="keto">Keto</option>
+    </select>
+  </div>
+
   <div class="field">
     <label>Gender</label>
-    <select id="gender"><option value="male">Male</option><option value="female">Female</option></select>
+    <select id="gender">
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
   </div>
+
   <div class="field">
     <label>Age</label>
-    <input id="age" type="number" min="10" max="100">
+    <input id="age" type="number">
   </div>
+
   <div class="field">
-    <label>Height (cm)</label>
+    <label>Height</label>
     <input id="height" type="number">
   </div>
+
   <div class="field">
-    <label>Weight (kg)</label>
+    <label>Weight</label>
     <input id="weight" type="number">
   </div>
+
   <div class="field">
     <label>Activity</label>
     <select id="activity">
@@ -133,121 +145,111 @@ canvas{max-width:100%;margin-top:20px}
       <option value="1.725">Very active</option>
     </select>
   </div>
+
+  <div class="field">
+    <label>Workout calories (optional)</label>
+    <input id="workout" type="number" placeholder="kcal burned">
+  </div>
+
   <div class="field">
     <label>Goal</label>
     <select id="goal">
       <option value="maintain">Maintain</option>
-      <option value="lose">Fat Loss</option>
-      <option value="gain">Muscle Gain</option>
-      <option value="recomp">Body Recomposition</option>
+      <option value="lose">Fat loss</option>
+      <option value="gain">Muscle gain</option>
+      <option value="recomp">Recomposition</option>
     </select>
   </div>
+
 </div>
 
 <br>
-<button onclick="calculate()">Calculate</button>
+<button onclick="calculate()">Calculate Macros</button>
+<button onclick="window.print()" style="margin-top:10px;background:#111">📄 Export PDF</button>
 </div>
 
 <!-- RESULTS -->
 <div class="card">
 <div class="results">
-  <div class="box">Calories<br><b id="cal">—</b></div>
-  <div class="box">Protein<br><b id="pro">—</b> g</div>
-  <div class="box">Carbs<br><b id="carb">—</b> g</div>
+  <div class="box">Calories<br><b id="calories">—</b> kcal</div>
+  <div class="box">Protein<br><b id="protein">—</b> g</div>
+  <div class="box">Carbs<br><b id="carbs">—</b> g</div>
   <div class="box">Fat<br><b id="fat">—</b> g</div>
 </div>
 
-<canvas id="chart" height="220"></canvas>
-</div>
-
-<!-- BODY RECOMPOSITION -->
-<div class="card">
-<h2>Body Recomposition Insight</h2>
-<div id="recomp" class="note">—</div>
-</div>
-
-<!-- MEAL PLAN -->
-<div class="card">
-<h2>Sample Daily Meal Plan</h2>
-<table>
-<tr><th>Meal</th><th>Food Example</th><th>Macro Focus</th></tr>
-<tr><td>Breakfast</td><td>Eggs + Oats</td><td>Protein + Carbs</td></tr>
-<tr><td>Lunch</td><td>Chicken, Rice, Veggies</td><td>Balanced</td></tr>
-<tr><td>Snack</td><td>Greek Yogurt + Nuts</td><td>Protein + Fat</td></tr>
-<tr><td>Dinner</td><td>Fish / Paneer + Salad</td><td>Protein</td></tr>
-</table>
-</div>
-
-<!-- FOOD LIST -->
-<div class="card">
-<h2>Macro Food List</h2>
-<table>
-<tr><th>Protein</th><th>Carbs</th><th>Fats</th></tr>
-<tr><td>Chicken breast</td><td>Rice</td><td>Olive oil</td></tr>
-<tr><td>Eggs</td><td>Oats</td><td>Avocado</td></tr>
-<tr><td>Fish</td><td>Potatoes</td><td>Nuts</td></tr>
-<tr><td>Paneer</td><td>Fruits</td><td>Seeds</td></tr>
-</table>
+<canvas id="macroChart" height="240"></canvas>
+<div class="note" id="insight"></div>
 </div>
 
 </div>
 
 <script>
-let pie;
+let chart;
 
 function calculate(){
-  const g=gender.value,a=+age.value,h=+height.value,w=+weight.value;
+  let h=+height.value, w=+weight.value;
+  if(unit.value==="us"){
+    h*=2.54;       // inches to cm
+    w*=0.453592;   // lb to kg
+  }
+
+  const a=+age.value, g=gender.value;
   if(!a||!h||!w){alert("Fill all fields");return;}
-  let bmr=g==="male"?(10*w+6.25*h-5*a+5):(10*w+6.25*h-5*a-161);
-  let cal=bmr*+activity.value;
-  if(goal.value==="lose") cal-=400;
-  if(goal.value==="gain") cal+=300;
+
+  let bmr = g==="male"
+    ? (10*w+6.25*h-5*a+5)
+    : (10*w+6.25*h-5*a-161);
+
+  let calories=bmr*+activity.value;
+  if(goal.value==="lose") calories-=400;
+  if(goal.value==="gain") calories+=300;
+
+  calories += +workout.value||0;
 
   let protein=w*(goal.value==="gain"?2.2:goal.value==="recomp"?2.0:1.8);
-  let fat=(cal*0.25)/9;
-  let carbs=(cal-(protein*4+fat*9))/4;
-  if(carbs<0) carbs=0;
 
-  cal=Math.round(cal); protein=Math.round(protein);
-  carbs=Math.round(carbs); fat=Math.round(fat);
+  let fat, carbs;
+  if(diet.value==="keto"){
+    carbs=30;
+    fat=(calories-(protein*4+carbs*4))/9;
+  }else if(diet.value==="lowcarb"){
+    carbs=100;
+    fat=(calories-(protein*4+carbs*4))/9;
+  }else{
+    fat=(calories*0.25)/9;
+    carbs=(calories-(protein*4+fat*9))/4;
+  }
 
-  calEl.textContent=cal;
-  proEl.textContent=protein;
-  carbEl.textContent=carbs;
-  fatEl.textContent=fat;
+  caloriesEl.textContent=Math.round(calories);
+  proteinEl.textContent=Math.round(protein);
+  carbsEl.textContent=Math.round(carbs);
+  fatEl.textContent=Math.round(fat);
 
-  recomp.innerHTML = goal.value==="recomp"
-  ? "You are in body recomposition mode: slight calorie balance with high protein to lose fat while preserving muscle."
-  : "Standard macro distribution based on your selected goal.";
+  insight.innerHTML=`
+  <b>Mode:</b> ${diet.value.toUpperCase()}<br>
+  <b>Workout calories added:</b> ${workout.value||0} kcal<br><br>
+  <b>Medical note:</b> Values are estimates for healthy adults.
+  Keto & low-carb modes adjust macro ratios only, not calorie needs.
+  `;
 
   drawChart(protein,carbs,fat);
 }
 
 function drawChart(p,c,f){
-  const ctx=document.getElementById("chart");
-  if(pie) pie.destroy();
-  pie=new Chart(ctx,{
+  if(chart) chart.destroy();
+  chart=new Chart(macroChart,{
     type:"pie",
     data:{
       labels:["Protein","Carbs","Fat"],
-      datasets:[{data:[p*4,c*4,f*9],backgroundColor:["#60a5fa","#34d399","#fbbf24"]}]
+      datasets:[{data:[p*4,c*4,f*9],
+      backgroundColor:["#60a5fa","#34d399","#fbbf24"]}]
     },
     options:{plugins:{legend:{position:"bottom"}}}
   });
 }
 
-const gender=document.getElementById("gender");
-const age=document.getElementById("age");
-const height=document.getElementById("height");
-const weight=document.getElementById("weight");
-const activity=document.getElementById("activity");
-const goal=document.getElementById("goal");
-
-const calEl=document.getElementById("cal");
-const proEl=document.getElementById("pro");
-const carbEl=document.getElementById("carb");
-const fatEl=document.getElementById("fat");
-const recomp=document.getElementById("recomp");
+const caloriesEl=calories, proteinEl=protein,
+carbsEl=carbs, fatEl=fat, insight=document.getElementById("insight");
 </script>
 
 </body>
