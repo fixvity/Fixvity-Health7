@@ -100,7 +100,12 @@ th{
   background:#f8fafc;
   text-align:left;
 }
-
+/* Ensure desktop table headers are visible */
+@media (min-width: 769px){
+  thead {
+    display: table-header-group;
+  }
+}
 /* ✅ MOBILE MEAL PLANNER FIX */
 @media (max-width:768px){
   table thead{display:none}
