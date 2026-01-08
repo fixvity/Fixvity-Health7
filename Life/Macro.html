@@ -84,7 +84,7 @@ canvas{max-width:100%;margin-top:20px}
   line-height:1.6;
 }
 
-/* TABLE */
+/* ===== TABLE (DESKTOP) ===== */
 table{
   width:100%;
   border-collapse:collapse;
@@ -100,13 +100,8 @@ th{
   background:#f8fafc;
   text-align:left;
 }
-/* Ensure desktop table headers are visible */
-@media (min-width: 769px){
-  thead {
-    display: table-header-group;
-  }
-}
-/* ✅ MOBILE MEAL PLANNER FIX */
+
+/* ===== MOBILE TABLE CARD VIEW ===== */
 @media (max-width:768px){
   table thead{display:none}
   table,tbody,tr,td{display:block;width:100%}
@@ -119,6 +114,7 @@ th{
   td{
     border:none;
     padding:6px 0;
+    text-align:left;
   }
   td::before{
     content:attr(data-label);
@@ -223,62 +219,74 @@ th{
 </div>
 
 <canvas id="macroChart" height="240"></canvas>
+
 <div class="note" id="insight"></div>
 </div>
 
 <!-- WEEKLY MEAL PLANNER -->
 <div class="card">
 <h2>Weekly Meal Planner (Sample)</h2>
+
 <table>
+<thead>
+<tr>
+  <th>Day</th>
+  <th>Breakfast</th>
+  <th>Lunch</th>
+  <th>Dinner</th>
+  <th>Snacks</th>
+</tr>
+</thead>
+
 <tbody>
 <tr>
-<td data-label="Day">Monday</td>
-<td data-label="Breakfast">Eggs & oats</td>
-<td data-label="Lunch">Chicken + rice</td>
-<td data-label="Dinner">Fish & vegetables</td>
-<td data-label="Snacks">Fruit, nuts</td>
+  <td data-label="Day">Monday</td>
+  <td data-label="Breakfast">Eggs & oats</td>
+  <td data-label="Lunch">Chicken + rice</td>
+  <td data-label="Dinner">Fish & vegetables</td>
+  <td data-label="Snacks">Fruit, nuts</td>
 </tr>
 <tr>
-<td data-label="Day">Tuesday</td>
-<td data-label="Breakfast">Greek yogurt</td>
-<td data-label="Lunch">Paneer & roti</td>
-<td data-label="Dinner">Lean beef & salad</td>
-<td data-label="Snacks">Seeds</td>
+  <td data-label="Day">Tuesday</td>
+  <td data-label="Breakfast">Greek yogurt</td>
+  <td data-label="Lunch">Paneer & roti</td>
+  <td data-label="Dinner">Lean beef & salad</td>
+  <td data-label="Snacks">Seeds</td>
 </tr>
 <tr>
-<td data-label="Day">Wednesday</td>
-<td data-label="Breakfast">Smoothie</td>
-<td data-label="Lunch">Dal & rice</td>
-<td data-label="Dinner">Chicken stir-fry</td>
-<td data-label="Snacks">Yogurt</td>
+  <td data-label="Day">Wednesday</td>
+  <td data-label="Breakfast">Smoothie</td>
+  <td data-label="Lunch">Dal & rice</td>
+  <td data-label="Dinner">Chicken stir-fry</td>
+  <td data-label="Snacks">Yogurt</td>
 </tr>
 <tr>
-<td data-label="Day">Thursday</td>
-<td data-label="Breakfast">Egg omelette</td>
-<td data-label="Lunch">Quinoa bowl</td>
-<td data-label="Dinner">Fish curry</td>
-<td data-label="Snacks">Fruit</td>
+  <td data-label="Day">Thursday</td>
+  <td data-label="Breakfast">Egg omelette</td>
+  <td data-label="Lunch">Quinoa bowl</td>
+  <td data-label="Dinner">Fish curry</td>
+  <td data-label="Snacks">Fruit</td>
 </tr>
 <tr>
-<td data-label="Day">Friday</td>
-<td data-label="Breakfast">Oats</td>
-<td data-label="Lunch">Chicken wrap</td>
-<td data-label="Dinner">Vegetable curry</td>
-<td data-label="Snacks">Nuts</td>
+  <td data-label="Day">Friday</td>
+  <td data-label="Breakfast">Oats</td>
+  <td data-label="Lunch">Chicken wrap</td>
+  <td data-label="Dinner">Vegetable curry</td>
+  <td data-label="Snacks">Nuts</td>
 </tr>
 <tr>
-<td data-label="Day">Saturday</td>
-<td data-label="Breakfast">Protein shake</td>
-<td data-label="Lunch">Rice & lentils</td>
-<td data-label="Dinner">Grilled chicken</td>
-<td data-label="Snacks">Fruit</td>
+  <td data-label="Day">Saturday</td>
+  <td data-label="Breakfast">Protein shake</td>
+  <td data-label="Lunch">Rice & lentils</td>
+  <td data-label="Dinner">Grilled chicken</td>
+  <td data-label="Snacks">Fruit</td>
 </tr>
 <tr>
-<td data-label="Day">Sunday</td>
-<td data-label="Breakfast">Light breakfast</td>
-<td data-label="Lunch">Home meal</td>
-<td data-label="Dinner">Balanced dinner</td>
-<td data-label="Snacks">Optional</td>
+  <td data-label="Day">Sunday</td>
+  <td data-label="Breakfast">Light breakfast</td>
+  <td data-label="Lunch">Home meal</td>
+  <td data-label="Dinner">Balanced dinner</td>
+  <td data-label="Snacks">Optional</td>
 </tr>
 </tbody>
 </table>
